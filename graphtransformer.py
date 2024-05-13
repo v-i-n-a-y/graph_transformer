@@ -81,7 +81,7 @@ class GraphTransformer(nn.Module):
         if self.batch_norm:
             self.batch_norm2 = nn.BatchNorm1d(O)
 
-    def forward(self, x):
+    def forward(self, data):
         """
         Forward Call
 
@@ -92,8 +92,10 @@ class GraphTransformer(nn.Module):
         edge_index - PyTorch Tensor
             Edge Connectivity
         """
+        x = data.x
+
         h_in1 = x
-        attn_out = self.attention(x)
+        attn_out = self.attention(x, data.edge_index)
         h = attn_out.view(-1, self.out_channels)
 
         h = F.dropout(h, self.dropout, training=self.training)
@@ -140,6 +142,6 @@ if __name__ == "__main__":
     num_heads = 4
     layer = GraphTransformer(in_dim, out_dim, num_heads)
 
-    out = layer(data.x)
+    out = layer(data)
     print("Input shape:", data.x.shape)
     print("Output shape:", out.shape)
